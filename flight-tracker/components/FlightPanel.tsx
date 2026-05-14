@@ -116,6 +116,9 @@ export default function FlightPanel({ flights, selectedFlight, onSelect, lastUpd
         <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-green)', padding: 12 }}>
           <div style={{ fontSize: 9, color: 'var(--text-muted)', letterSpacing: '0.15em', marginBottom: 8, fontFamily: 'var(--font-display)' }}>TRACK DATA</div>
           <Row label="CALLSIGN" value={f.callsign || 'N/A'} />
+          {f.registration && <Row label="REGISTRATION" value={f.registration} />}
+          {f.operator && <Row label="OPERATOR" value={f.operator} />}
+          {f.aircraft_type && <Row label="AIRCRAFT TYPE" value={f.aircraft_type} />}
           <Row label="ICAO24" value={f.icao24.toUpperCase()} />
           <Row label="COUNTRY" value={f.origin_country} />
           <Row label="POSITION" value={f.latitude && f.longitude ? `${f.latitude.toFixed(4)}°N ${f.longitude.toFixed(4)}°` : '---'} />

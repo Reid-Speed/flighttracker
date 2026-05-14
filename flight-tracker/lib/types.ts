@@ -16,6 +16,10 @@ export interface FlightState {
   squawk: string | null;
   spi: boolean;
   position_source: number;
+  // Extra fields from adsb.fi
+  aircraft_type?: string | null;
+  registration?: string | null;
+  operator?: string | null;
 }
 
 export interface OpenSkyResponse {
@@ -44,6 +48,9 @@ export function parseFlightStates(raw: (string | number | boolean | null)[][]): 
       squawk: s[14] as string | null,
       spi: s[15] as boolean,
       position_source: s[16] as number,
+      aircraft_type: s[17] as string | null,
+      registration: s[18] as string | null,
+      operator: s[19] as string | null,
     }));
 }
 
