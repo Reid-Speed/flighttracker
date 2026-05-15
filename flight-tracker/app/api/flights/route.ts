@@ -1,15 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-// airplanes.live - free, no auth, no feeder required, ADSBex v2 compatible
 const BASE = 'https://api.airplanes.live/v2';
 
 export async function GET(request: NextRequest) {
-  // Tile CONUS with 4 overlapping circles of 250nm each
   const tiles = [
-    { lat: 40.0, lon: -115.0 }, // West
-    { lat: 40.0, lon: -90.0 },  // Central
-    { lat: 40.0, lon: -75.0 },  // East
-    { lat: 28.0, lon: -95.0 },  // South
+    { lat: 40.0, lon: -115.0 },
+    { lat: 40.0, lon: -90.0 },
+    { lat: 40.0, lon: -75.0 },
+    { lat: 28.0, lon: -95.0 },
   ];
 
   try {
@@ -22,7 +20,6 @@ export async function GET(request: NextRequest) {
       )
     );
 
-    // Merge, deduplicate by hex
     const seen = new Set<string>();
     const merged: any[] = [];
     for (const result of results) {
@@ -38,31 +35,32 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // Convert to OpenSky-compatible state vector array
     const states = merged
       .filter(a => a.lat && a.lon)
       .map(a => [
-        (a.hex || '').replace('~', ''),                         // 0: icao24
-        (a.flight || a.r || '').trim(),                         // 1: callsign
-        a.ownOp || a.r || a.desc || 'Unknown',                  // 2: origin_country/operator
-        a.seen_pos || null,                                      // 3: time_position
-        a.seen || 0,                                             // 4: last_contact
-        a.lon,                                                   // 5: longitude
-        a.lat,                                                   // 6: latitude
-        a.alt_baro !== 'ground' && typeof a.alt_baro === 'number'
-          ? a.alt_baro * 0.3048 : 0,                            // 7: baro_altitude ft→m
-        a.alt_baro === 'ground' || (a.gs != null && a.gs < 30), // 8: on_ground
-        a.gs ? a.gs * 0.514444 : null,                          // 9: velocity knots→m/s
-        a.track ?? null,                                         // 10: true_track
-        a.baro_rate ? a.baro_rate * 0.00508 : null,             // 11: vertical_rate fpm→m/s
-        null,                                                    // 12: sensors
-        a.alt_geom ? a.alt_geom * 0.3048 : null,               // 13: geo_altitude
-        a.squawk || null,                                        // 14: squawk
-        false,                                                   // 15: spi
-        0,                                                       // 16: position_source
-        a.t || null,                                             // 17: aircraft type
-        a.r || null,                                             // 18: registration
-        a.ownOp || null,                                         // 19: operator
+        (a.hex || '').replace('~', ''),
+        (a.flight || a.r || '').trim(),
+        a.ownOp || a.r || 'Unknown',
+        a.seen_pos || null,
+        a.seen || 0,
+        a.lon,
+        a.lat,
+        a.alt_baro !== 'ground' && typeof a.alt_baro === 'number' ? a.alt_baro * 0.3048 : 0,
+        a.alt_baro === 'ground' || (a.gs != null && a.gs < 30),
+        a.gs ? a.gs * 0.514444 : null,
+        a.track ?? null,
+        a.baro_rate ? a.baro_rate * 0.00508 : null,
+        null,
+        a.alt_geom ? a.alt_geom * 0.3048 : null,
+        a.squawk || null,
+        false,
+        0,
+        a.t || null,          // 17: aircraft ICAO type code (e.g. B738)
+        a.r || null,          // 18: registration
+        a.ownOp || null,      // 19: operator
+        a.dep || a.orig || null,  // 20: departure airport IATA/ICAO
+        a.arr || a.dest || null,  // 21: arrival airport IATA/ICAO
+        a.flight_iata || a.flight || null, // 22: flight number IATA
       ]);
 
     return NextResponse.json({

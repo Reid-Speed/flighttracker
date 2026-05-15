@@ -121,8 +121,8 @@ export default function HistoryView({ onIncidentsLoaded, scrollerIncident }: His
     setError('');
     try {
       const params = new URLSearchParams({
-        ResultsPerPage: String(PAGE_SIZE),
-        StartRow: String(pageNum * PAGE_SIZE),
+        limit: String(PAGE_SIZE),
+        offset: String(pageNum * PAGE_SIZE),
         ...(airline && { airline }),
         ...(aircraft && { aircraft }),
         ...(location && { location }),
