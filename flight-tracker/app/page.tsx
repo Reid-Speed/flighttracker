@@ -9,11 +9,10 @@ const LiveView = dynamic(() => import('@/components/LiveView'), { ssr: false });
 const HistoryView = dynamic(() => import('@/components/HistoryView'), { ssr: false });
 
 export default function Home() {
-  const [activeView, setActiveView] = useState<'live' | 'history'>('live');
+  const [activeView, setActiveView] = useState<'live'|'history'>('live');
   const [flightCount, setFlightCount] = useState(0);
   const [recentIncidents, setRecentIncidents] = useState<NTSBAccident[]>([]);
-  const [scrollerIncident, setScrollerIncident] = useState<NTSBAccident | null>(null);
-  const [newsLoading, setNewsLoading] = useState(false);
+  const [scrollerIncident, setScrollerIncident] = useState<NTSBAccident|null>(null);
 
   const handleIncidentsLoaded = useCallback((incidents: NTSBAccident[]) => {
     setRecentIncidents(incidents);
@@ -25,15 +24,15 @@ export default function Home() {
   }, []);
 
   return (
-    <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--bg-black)', overflow: 'hidden' }}>
-      <Header activeView={activeView} onViewChange={setActiveView} flightCount={flightCount} />
-      <NewsScroller incidents={recentIncidents} loading={newsLoading} onSelect={handleScrollerSelect} />
-      <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
-        {activeView === 'live' ? (
-          <LiveView onFlightCountChange={setFlightCount} />
-        ) : (
-          <HistoryView onIncidentsLoaded={handleIncidentsLoaded} scrollerIncident={scrollerIncident} />
-        )}
+    <div style={{ height:'100%', display:'flex', flexDirection:'column', background:'var(--bg)', overflow:'hidden' }}>
+      <style global jsx>{``}</style>
+      <Header activeView={activeView} onViewChange={setActiveView} flightCount={flightCount}/>
+      <NewsScroller incidents={recentIncidents} loading={false} onSelect={handleScrollerSelect}/>
+      <div style={{ flex:1, display:'flex', overflow:'hidden', minHeight:0 }}>
+        {activeView==='live'
+          ? <LiveView onFlightCountChange={setFlightCount}/>
+          : <HistoryView onIncidentsLoaded={handleIncidentsLoaded} scrollerIncident={scrollerIncident}/>
+        }
       </div>
     </div>
   );
